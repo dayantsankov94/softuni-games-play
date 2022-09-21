@@ -7,7 +7,7 @@ const GameDetails = ({
 }) => {
 
     const { gameId } = useParams();
-    const [comment,setComment] = useState({
+    const [comment, setComment] = useState({
         username: '',
         comment: ''
     })
@@ -17,9 +17,9 @@ const GameDetails = ({
     const addCommentHandler = (e) => {
         e.preventDefault();
         const finalComment = `${comment.username}: ${comment.comment}`;
-        addComment(gameId,finalComment);
+        addComment(gameId, finalComment);
         console.log(comment);
-        
+
     }
 
     const onChange = (e) => {
@@ -42,21 +42,23 @@ const GameDetails = ({
                 <p className="text">
                     {game.summary}
                 </p>
-                {/* Bonus ( for Guests and Users ) */}
+
                 <div className="details-comments">
                     <h2>Comments:</h2>
                     <ul>
-                        {/* list all comments for current game (If any) */}
-                        <li className="comment">
-                            <p>Content: I rate this one quite highly.</p>
-                        </li>
-                        <li className="comment">
-                            <p>Content: The best game.</p>
-                        </li>
+                        {game.comments?.map(x =>
+                            <li key={x._id} className="comment">
+                                <p>{x}</p>
+                            </li>
+                        )}
                     </ul>
-                    {/* Display paragraph: If there are no games in the database */}
-                    <p className="no-comment">No comments.</p>
+                    {!game.comments &&
+                        <p className="no-comment">No comments.</p>
+                    }
                 </div>
+
+
+
                 {/* Edit/Delete buttons ( Only for creator of this game )  */}
                 <div className="buttons">
                     <a href="#" className="button">
