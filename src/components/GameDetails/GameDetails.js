@@ -18,7 +18,7 @@ const GameDetails = ({
         e.preventDefault();
         const finalComment = `${comment.username}: ${comment.comment}`;
         addComment(gameId, finalComment);
-        console.log(comment);
+        
 
     }
 
