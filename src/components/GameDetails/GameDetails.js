@@ -1,24 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import * as gameService from '../../services/gameService';
 
 const GameDetails = ({
-    games,
     addComment
 }) => {
 
-    const { gameId } = useParams();
+    const [game, setGame] = useState({})
     const [comment, setComment] = useState({
         username: '',
         comment: ''
     })
+    const { gameId } = useParams();
 
-    const game = games.find(x => x._id == gameId);
+    useEffect(() => {
+        gameService.getOne(gameId)
+            .then(result => {
+                setGame(result)
+            })
+    }, [])
 
     const addCommentHandler = (e) => {
         e.preventDefault();
         const finalComment = `${comment.username}: ${comment.comment}`;
         addComment(gameId, finalComment);
-        
+
 
     }
 
@@ -61,12 +68,12 @@ const GameDetails = ({
 
                 {/* Edit/Delete buttons ( Only for creator of this game )  */}
                 <div className="buttons">
-                    <a href="#" className="button">
+                    <Link to={`/games/${game._id}/edit`} className="button">
                         Edit
-                    </a>
-                    <a href="#" className="button">
+                    </Link>
+                    <Link to={`/games/${game._id}/edit`} className="button">
                         Delete
-                    </a>
+                    </Link>
                 </div>
             </div>
             {/* Bonus */}
