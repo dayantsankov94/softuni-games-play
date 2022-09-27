@@ -1,40 +1,38 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
+import { GameContext } from '../../contexts/GameContext';
 import * as gameService from '../../services/gameService';
+import * as commentService from '../../services/commentService';
 
-const GameDetails = ({
-    addComment
-}) => {
+const GameDetails = () => {
 
-    const [game, setGame] = useState({})
-    const [comment, setComment] = useState({
-        username: '',
-        comment: ''
-    })
+    const { addComment, fetchGameDetails, selectGame } = useContext(GameContext);
+
     const { gameId } = useParams();
 
+    const game = selectGame(gameId)
+
     useEffect(() => {
-        gameService.getOne(gameId)
-            .then(result => {
-                setGame(result)
-            })
-    }, [])
+        (async () => {
+            const gameDetails = await gameService.getOne(gameId);
+            const gameComments = await commentService.getByGameId(gameId);
+            fetchGameDetails(gameId, {...gameDetails, comments: gameComments.map(x => `${x.user.email}: ${x.text}`)});
+        })();
+    }, []);
 
     const addCommentHandler = (e) => {
         e.preventDefault();
-        const finalComment = `${comment.username}: ${comment.comment}`;
-        addComment(gameId, finalComment);
 
+        const formData = new FormData(e.target);
 
-    }
+        const comment = formData.get('comment');
 
-    const onChange = (e) => {
-        setComment(state => ({
-            ...state,
-            [e.target.name]: e.target.value,
-        }))
-    }
+        commentService.create(gameId, comment)
+            .then(result => {
+                addComment(gameId, comment);
+            });
+    };
 
     return (
         <section id="game-details">
@@ -54,7 +52,7 @@ const GameDetails = ({
                     <h2>Comments:</h2>
                     <ul>
                         {game.comments?.map(x =>
-                            <li key={x._id} className="comment">
+                            <li key={x} className="comment">
                                 <p>{x}</p>
                             </li>
                         )}
@@ -81,19 +79,10 @@ const GameDetails = ({
             <article className="create-comment">
                 <label>Add new comment:</label>
                 <form className="form" onSubmit={addCommentHandler}>
-                    <input
-                        type="text"
-                        name="username"
-                        placeholder="John Doe"
-                        onChange={onChange}
-                        value={comment.username}
-                    />
 
                     <textarea
                         name="comment"
                         placeholder="Comment......"
-                        onChange={onChange}
-                        value={comment.comment}
                     />
                     <input
                         className="btn submit"
@@ -103,6 +92,6 @@ const GameDetails = ({
                 </form>
             </article>
         </section>
-    )
-}
+    );
+};
 export default GameDetails;

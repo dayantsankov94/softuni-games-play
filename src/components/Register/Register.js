@@ -42,7 +42,7 @@ const Register = () => {
                     <input className="btn submit" type="submit" defaultValue="Register" />
                     <p className="field">
                         <span>
-                            If you already have profile click <a href="#">here</a>
+                            If you already have profile click <a href="/login">here</a>
                         </span>
                     </p>
                 </div>
