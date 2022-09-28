@@ -1,5 +1,4 @@
-import { Route, Routes, useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { Route, Routes } from 'react-router-dom'
 
 import { AuthProvider } from './contexts/AuthContext'
 
@@ -12,8 +11,10 @@ import Catalog from './components/Catalog/Catalog';
 import GameDetails from './components/GameDetails/GameDetails';
 import Logout from './components/Logout/Logout'
 import { GameProvider } from './contexts/GameContext';
-import './App.css';
 import EditGame from './components/EditGame/EditGame';
+import PrivateRoute from './components/common/PrivateRoute';
+import PrivateGuard from './components/common/PrivateGuard';
+import './App.css';
 
 function App() {
     return (
@@ -27,11 +28,18 @@ function App() {
                             <Route path="/" element={<Home />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register />} />
-                            <Route path="/logout" element={<Logout />} />
-                            <Route path="/create" element={<CreateGame />} />
+                            <Route path="/create" element={(
+                                <PrivateRoute>
+                                    <CreateGame />
+                                </PrivateRoute>
+                            )} />
+                            <Route element={<PrivateGuard />}>
+                                <Route path="/logout" element={<Logout />} />
+                                <Route path="/games/:gameId/edit" element={<EditGame />} />
+                            </Route>
                             <Route path="/catalog" element={<Catalog />} />
-                            <Route path="/catalog/:gameId/*" element={<GameDetails />} />
-                            <Route path="/games/:gameId/edit" element={<EditGame />} />
+                            <Route path="/catalog/:gameId" element={<GameDetails />} />
+
                         </Routes>
                     </main>
                 </GameProvider>

@@ -4,7 +4,7 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({
-    
+
     children,
 
 }) => {
@@ -20,7 +20,13 @@ export const AuthProvider = ({
     };
 
     return (
-        <AuthContext.Provider value={{ user: auth, userLogin, userLogout }}>
+        <AuthContext.Provider value=
+            {{
+                user: auth,
+                userLogin,
+                userLogout,
+                isAuthenticated: !!auth.accessToken
+            }}>
             {children}
         </AuthContext.Provider>
     );

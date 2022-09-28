@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import { GameContext } from '../../contexts/GameContext';
 import * as gameService from '../../services/gameService';
@@ -7,8 +7,8 @@ import * as commentService from '../../services/commentService';
 
 const GameDetails = () => {
 
-    const { addComment, fetchGameDetails, selectGame } = useContext(GameContext);
-
+    const { addComment, fetchGameDetails, selectGame, removeGame } = useContext(GameContext);
+    const navigate = useNavigate()
     const { gameId } = useParams();
 
     const game = selectGame(gameId)
@@ -17,7 +17,7 @@ const GameDetails = () => {
         (async () => {
             const gameDetails = await gameService.getOne(gameId);
             const gameComments = await commentService.getByGameId(gameId);
-            fetchGameDetails(gameId, {...gameDetails, comments: gameComments.map(x => `${x.user.email}: ${x.text}`)});
+            fetchGameDetails(gameId, { ...gameDetails, comments: gameComments.map(x => `${x.user.email}: ${x.text}`) });
         })();
     }, []);
 
@@ -33,6 +33,18 @@ const GameDetails = () => {
                 addComment(gameId, comment);
             });
     };
+
+    const gameDeleteHandler = () => {
+        const confirmation = window.confirm('Are you sure you want to delete this game');
+
+        if (confirmation) {
+            gameService.remove(gameId)
+                .then(() => {
+                    removeGame(gameId)
+                    navigate('/')
+                })
+        }
+    }
 
     return (
         <section id="game-details">
@@ -69,9 +81,9 @@ const GameDetails = () => {
                     <Link to={`/games/${game._id}/edit`} className="button">
                         Edit
                     </Link>
-                    <Link to={`/games/${game._id}/edit`} className="button">
+                    <button onClick={gameDeleteHandler} className="button">
                         Delete
-                    </Link>
+                    </button>
                 </div>
             </div>
             {/* Bonus */}
